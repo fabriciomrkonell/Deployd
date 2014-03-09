@@ -1,12 +1,66 @@
 <!DOCTYPE html>
-<html>
-<head>
-	<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
-	<script type="text/javascript" src="dpd.js"></script>
-</head>
-<body>
-	<h1>Welcome to Deployd!</h1>
-	<p>You've just created a Deployd app. You can add front-end files in the <code>public</code> folder.</p>
-	<p>If you're new to Deployd, have a look at the <a href="http://docs.deployd.com/docs/getting-started/what-is-deployd.md">Getting Started Guide</a> or <a href="http://docs.deployd.com/docs/getting-started/your-first-api.md">Hello World Tutorial<a>.</p>
-</body>
+<html ng-app="loginApp">
+  <head>
+    <title>Login</title>
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  </head>
+  <body ng-controller="loginCtrl">
+    <div class="container">
+      <div class="pull-right">
+        <a href="/cadastrar.html">Cadastrar</a>
+      </div>
+      <form class="form-signin" role="form">
+        <div class="text-center">
+          <h2 class="form-signin-heading">Login</h2>
+        </div>        
+        <input class="form-control" type="text" placeholder="Usuário" ng-model="usuario">
+        <input class="form-control" type="password" placeholder="Senha" ng-model="senha">
+        <label class="checkbox">
+          <input value="remember-me" type="checkbox"> Lembrar Senha
+        </label>        
+        <button class="btn btn-lg btn-primary btn-block" type="button" ng-click="fazerLogin()">Fazer Login</button>
+        <br />
+        <div class="alert alert-danger fade in" ng-show="mensagem">      
+          Usuário ou senha inválidos!
+        </div>
+      </form>  
+    </div>        
+    <script type="text/javascript" src="/js/lib/jquery.js"></script>
+    <script type="text/javascript" src="/js/lib/angular.min.js"></script>
+    <script type="text/javascript" src="/dpd.js"></script>
+    <script type="text/javascript">
+      var app = angular.module("loginApp", []);
+      app.controller("loginCtrl", function($scope, $timeout, $window){
+         
+        dpd.users.me(function(user) {
+          if (user) {            
+            location.href = "/menu.html";
+          }
+        }); 
+
+        $scope.mensagem = false;
+
+        $scope.fazerLogin = function(){
+          var usuario = $scope.usuario;
+          var senha = $scope.senha;
+          dpd.users.login({username: usuario, password: senha}, function(session, error) {
+            if (error) {     
+              $scope.mensagem = true;
+              $timeout(function() { 
+                $scope.mensagem = false;              
+              }, 3000);              
+              if (!$scope.$$phase) {
+                $scope.$apply();
+              }
+            } else {
+              $window.location.href = "/menu.html";
+            }
+          });
+          return false;
+        };
+
+      });            
+    </script>
+  </body>
 </html>
